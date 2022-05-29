@@ -1,52 +1,41 @@
-const crearNuevaLinea = (nombre, email) => {
-  const linea = document.createElement("tr");
-  const contenido = `
-            <td class="td" data-td>${nombre}</td>
-            <td>${email}</td>
-            <td>
-              <ul class="table__button-control">
-                <li>
-                  <a
-                    href="../screens/editar_cliente.html"
-                    class="simple-button simple-button--edit"
-                    >Editar</a
-                  >
-                </li>
-                <li>
-                  <button
-                    class="simple-button simple-button--delete"
-                    type="button"
-                  >
-                    Eliminar
-                  </button>
-                </li>
-              </ul>
-            </td>
-          `;
-  linea.innerHTML = contenido;
-  return linea;
-};
-const table = document.querySelector("[data-table]");
-const http = new XMLHttpRequest();
-//Abrir http (metodo,url)
-//CRUD -Metodos HTTP
-//Create -POST
-//Read -GET
-//Update -PUT/PATCH
-//Delete -DELETE
-http.open("GET", "http://localhost:3000/perfil");
-http.send();
-http.onload = () => {
-  const data = JSON.parse(http.response);
-  data.forEach((perfil) => {
-    const nuevaLinea = crearNuevaLinea(perfil.nombre, perfil.email);
-    table.appendChild(nuevaLinea);
+const listarClientes = () =>
+  fetch("http://localhost:3000/perfil").then((respuesta) => respuesta.json());
+
+const crearCliente = (nombre, email) => {
+  return fetch("http://localhost:3000/perfil", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre, email, id: uuid.v4() }),
   });
-  const htp2 = new XMLHttpRequest();
-  htp2.open("GET", "http://localhost:3000/perfil/hoy");
-  htp2.send();
-  htp2.onload = () => {
-    const data2 = JSON.parse(htp2.response);
-    
-  };
+};
+const eliminarCliente = (id) => {
+  console.log("Eliminar ", id);
+  return fetch(`http://localhost:3000/perfil/${id}`, {
+    method: "DELETE",
+  });
+};
+const detalleCliente = (id) => {
+  return fetch(`http://localhost:3000/perfil/${id}`).then((repuesta) =>
+    repuesta.json()
+  );
+};
+const actualizarCliente = (nombre, email, id) => {
+  return fetch(`http://localhost:3000/perfil/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre, email }),
+  })
+    .then((respuesta) => respuesta)
+    .catch((err) => console.log(err));
+};
+export const clientServices = {
+  listarClientes,
+  crearCliente,
+  eliminarCliente,
+  detalleCliente,
+  actualizarCliente
 };
